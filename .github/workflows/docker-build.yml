@@ -1,0 +1,32 @@
+name: Build and Tag Docker Image
+
+on:
+  push:
+    tags:
+      - "v*"
+  workflow_dispatch:
+
+jobs:
+  docker-build:
+    name: Build Docker Image
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set version
+        run: echo "VERSION=${GITHUB_REF_NAME}" >> "$GITHUB_ENV"
+
+      - name: Verify Docker
+        run: docker --version
+
+      - name: Build Docker image
+        run: |
+          docker build \
+            -f DockerFile \
+            -t my-app:${VERSION} \
+            -t my-app:latest .
+
+      - name: Display built images
+        run: docker images my-app
